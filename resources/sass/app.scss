@@ -1,0 +1,18 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.vdp-datepicker, 
+.dates.input-group {
+    width: 60%;
+}
+
+.dates.input-group input[disabled],
+.vdp-datepicker .form-control[readonly] {
+    background-color: #ffffff;
+}
