@@ -2,20 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use DB;
 use Illuminate\Http\Request;
 use App\Tour;
 use App\TourDate;
+use DB;
 
 class TourController extends Controller
 {
-    private $status = ['Unpaid', 'Paid', 'Cancelled'];
-
     public function index() {
         $tour = Tour::orderBy('id', 'desc')->get();
-        foreach ($tour as $key => $value) {
-            $tour[$key]['status'] = $this->status[$value['status']];
-        }
         return $tour;
     }
 
@@ -28,10 +23,11 @@ class TourController extends Controller
         return $count;
     }
 
-    public function create(Request $request) {
+    public function store(Request $request) {
         $this->validate($request, [
             'name' => 'required', 
             'itinerary' => 'required',
+            'status' => 'required',
         ]);
 
         DB::beginTransaction();
@@ -40,6 +36,7 @@ class TourController extends Controller
             $tour = Tour::create([
                 'name' => $request->name,
                 'itinerary' => $request->itinerary,
+                'status' => $request->status,
             ]);
 
             if ($request->dates) {
@@ -72,6 +69,7 @@ class TourController extends Controller
         $this->validate($request, [
             'name' => 'required', 
             'itinerary' => 'required',
+            'status' => 'required',
         ]);
 
         DB::beginTransaction();
@@ -82,6 +80,7 @@ class TourController extends Controller
             $tour->update([
                 'name' => $request->name,
                 'itinerary' => $request->itinerary,
+                'status' => $request->status,
             ]);
 
             // Update old dates
@@ -119,10 +118,9 @@ class TourController extends Controller
         }
     }
 
-    public function delete(Request $request, $id) {
-        $tour = Tour::findOrFail($id);
-        $tour->delete();
-
-        return 204;
+    public function showEnable($id) {
+        return Tour::with(['dates' => function ($query) {
+             $query->where('status', 0);
+        }])->where('id', $id)->first();
     }
 }

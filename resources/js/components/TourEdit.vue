@@ -3,7 +3,20 @@
         <h2 class="m-5 text-center text-primary">Edit Tour</h2>
         <form v-on:submit.prevent="updateTour">
             <div class="form-group">
-                <label for="">Tour Name</label>
+                <label>Status</label>
+                <div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="draft" name="status" value="0" v-model="tour.status"> 
+                        <label class="custom-control-label" for="draft">Draft</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" id="public" name="status" value="1" v-model="tour.status"> 
+                        <label class="custom-control-label" for="public">Public</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tour Name</label>
                 <input 
                     type="text" 
                     ref="name" 
@@ -17,7 +30,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="">Itinerary</label>
+                <label>Itinerary</label>
                 <textarea 
                     rows="5"
                     ref="itinerary" 
@@ -28,7 +41,7 @@
                 <div class="invalid-feedback">The itinerary field is required.</div>
             </div>
             <div class="form-group">
-                <label for="">Available Dates</label>
+                <label>Available Dates</label>
                 <div class="dates input-group mb-3" v-for="(date, index) in tour.oldDates" :key="index">
                     <input class="form-control" :value="date.date" disabled>
                     <div v-if="!date.status" class="input-group-append">
@@ -42,6 +55,7 @@
                     <datepicker 
                         name="date[]" 
                         v-model="tour.dates[index]" 
+                        :wrapper-class="'w60'"
                         :bootstrap-styling="true" 
                         :disabled-dates="selected"
                         :placeholder="'Select Date'"
@@ -72,6 +86,7 @@
                     itinerary: '',
                     oldDates: [],
                     dates: [],
+                    status: '',
                 },
                 selected: {
                     dates: []
@@ -104,11 +119,6 @@
             });
         },
         methods: {
-            // selectDate(index) {
-            //     // console.log(this.tour.oldDates)
-            //     // this.selected.dates = this.tour.oldDates.map(date => new Date(date.date));
-            //     // console.log(this.selected.dates)
-            // },
             updateTour() {
                 this.submitted = true;
                 this.validate().then(() => {

@@ -1,0 +1,147 @@
+<template>
+    <div class="container">
+        <h2 class="m-5 text-center text-primary">Booking</h2>
+        <form v-on:submit.prevent="createBooking">
+            <input type="hidden" name="tour_id" :value="booking.tour_id">
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Tour Name</label>
+                <div class="col-sm-10">
+                    <input disabled class="form-control-plaintext" type="text" :value="booking.tour_name" >
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Tour Date</label>
+                <div class="col-sm-10">
+                    <select name="tour_date" v-model="booking.tour_date" :class="{'custom-select': true, 'mr-sm-2': true, 'form-control': true, 'is-invalid': submitted && !booking.tour_date}">
+                        <option value="">Choose...</option>
+                        <option v-for="date in booking.tour_dates" :key="date.index" :value="date.value" ref="tour_date">{{date.label}}</option>
+                    </select>
+                    <div class="invalid-feedback">The Tour Date field is required.</div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Passengers</label>
+                <div class="col-sm-10 text-right">
+                    <input type="button" class="btn btn-success" value="Add" @click="booking.passengers.push({checked: false, given_name: '', sur_name: '', email: '', mobile: '', passport: '', birth_date: '', special_request: ''})">
+                </div>
+            </div>
+            <div class="form-group">
+                <ul v-for="(data, index) in booking.passengers" class="list-group mb-2">
+                    <li class="list-group-item">
+                        <div class="form-row">
+                            <div class="col-md-4 mb-3">
+                                <label>Given Name</label>
+                                <input type="text" v-model="data.given_name" :class="{'form-control': true, 'is-invalid': data.checked && !data.given_name}" placeholder="Given Name">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Surname</label>
+                                <input type="text" v-model="data.sur_name" :class="{'form-control': true, 'is-invalid': data.checked && !data.sur_name}" placeholder="Surname">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Email</label>
+                                <input type="text" v-model="data.email" :class="{'form-control': true, 'is-invalid': data.checked && !data.email}" placeholder="Email">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Mobile</label>
+                                <input type="text" v-model="data.mobile" :class="{'form-control': true, 'is-invalid': data.checked && !data.mobile}" placeholder="Mobile">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Passport</label>
+                                <input type="text" v-model="data.passport" :class="{'form-control': true, 'is-invalid': data.checked && !data.passport}" placeholder="Passport">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label>Birth Date</label>
+                                <datepicker 
+                                     v-model="data.birth_date"
+                                    :input-class="{'form-control': true, 'is-invalid': data.checked && !data.birth_date}" 
+                                    :placeholder="'Select Birth Date'"
+                                ></datepicker>
+                            </div>
+                            <div class="col-md-12">
+                                <label>Special Request</label>
+                                <textarea class="form-control" v-model="data.special_request" placeholder="Special Request"></textarea>
+                            </div>
+                        </div>
+                    </li>
+                    <input type="button" class="btn btn-secondary mb-2" value="Remove" @click="booking.passengers.splice(index, 1)">
+                </ul>
+            </div>
+            <div class="text-center mb-10">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <router-link class="btn btn-outline-primary" :to="'/'">Back</router-link>
+            </div>
+        </form>
+    </div>
+</template>
+<script>
+    import Datepicker from 'vuejs-datepicker';
+    import moment from 'moment'
+    
+    export default {
+        data() {
+            return {
+                booking: {
+                    tour_id: this.$route.params.tourId,
+                    tour_name: '',
+                    tour_date: '',
+                    passengers: [],
+                },
+                submitted: false,
+            }
+        },
+        components: {
+            Datepicker
+        },
+        created() {
+            let uri = `http://localhost:8000/booking/tour/${this.$route.params.tourId}`;
+            Axios.get(uri).then(response => {
+                this.booking.tour_id = response.data.id;
+                this.booking.tour_name = response.data.name;
+                if (response.data.dates) {
+                    this.booking.tour_dates = response.data.dates.map(date => {
+                        return {
+                            'value': moment(date.date).format('YYYY-MM-DD'),
+                            'label': moment(date.date).format('DD MMM YYYY'),
+                        }
+                    });
+                }
+            });
+        },
+        methods: {
+            createBooking() {
+                this.submitted = true;
+                if (this.validate()) {
+                    const uri = `http://localhost:8000/booking/`;
+                    Axios.post(uri, this.booking).then(response => {
+                        if (response.data.status === 'success') {
+                            this.$router.push({name: 'tourList'});
+                        } else {
+                            alert(response.data.message);
+                        }
+                    });
+                }
+            },
+            validate() {
+                const passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+                let valid = true;
+
+                if (!this.booking.tour_date) {
+                    valid = false;
+                }
+
+                this.booking.passengers.forEach((passenger, index) => {
+                    this.booking.passengers[index].checked = true;
+                    if (valid) {
+                        Object.keys(passenger).some((elem) => {
+                            if (passenger_required.includes(elem) && !passenger[elem]) {
+                                valid = false;
+                            }
+                        });
+                    }
+                });
+
+                return valid;
+            },
+        },
+    }
+</script>

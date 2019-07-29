@@ -15,9 +15,9 @@ class Booking extends Model
         return $this->belongsTo('App\Tour');
     }
 
-    public function passengers()
+    public function booking_passenger()
     {
-        return $this->hasMany('App\Passenger');
+        return $this->hasMany('App\BookingPassenger');
     }
 
     public function invoice()

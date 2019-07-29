@@ -1688,10 +1688,10 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Booking.vue?vue&type=script&lang=js&":
-/*!******************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Booking.vue?vue&type=script&lang=js& ***!
-  \******************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingAdd.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingAdd.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1753,82 +1753,339 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      tour: {
-        name: '',
-        itinerary: '',
-        dates: []
+      booking: {
+        tour_id: this.$route.params.tourId,
+        tour_name: '',
+        tour_date: '',
+        passengers: []
       },
-      nameValid: null,
       submitted: false
     };
   },
   components: {
     Datepicker: vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
+  created: function created() {
+    var _this = this;
+
+    var uri = "http://localhost:8000/booking/tour/".concat(this.$route.params.tourId);
+    Axios.get(uri).then(function (response) {
+      _this.booking.tour_id = response.data.id;
+      _this.booking.tour_name = response.data.name;
+
+      if (response.data.dates) {
+        _this.booking.tour_dates = response.data.dates.map(function (date) {
+          return {
+            'value': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('YYYY-MM-DD'),
+            'label': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('DD MMM YYYY')
+          };
+        });
+      }
+    });
+  },
   methods: {
-    createTour: function createTour() {
-      var _this = this;
+    createBooking: function createBooking() {
+      var _this2 = this;
 
       this.submitted = true;
-      this.validate().then(function () {
-        _this.tour.dates = _this.tour.dates.map(function (date) {
-          return new Date(moment__WEBPACK_IMPORTED_MODULE_1___default()(date).format('YYYY-MM-DD 00:00:00'));
-        });
-      }).then(function () {
-        var uri = 'http://localhost:8000/tour/';
-        Axios.post(uri, _this.tour).then(function (response) {
+
+      if (this.validate()) {
+        var uri = "http://localhost:8000/booking/";
+        Axios.post(uri, this.booking).then(function (response) {
           if (response.data.status === 'success') {
-            _this.$router.push({
+            _this2.$router.push({
               name: 'tourList'
             });
           } else {
             alert(response.data.message);
           }
         });
-      })["catch"](function (elem) {
-        _this.$refs[elem].focus();
-      });
+      }
     },
     validate: function validate() {
-      var _this2 = this;
-
-      return new Promise(function (resolve, reject) {
-        if (_this2.tour.name) {
-          _this2.checkNameValid().then(function (data) {
-            if (data === 0) {
-              _this2.nameValid = true;
-              resolve();
-            } else {
-              _this2.nameValid = false;
-              reject('name');
-            }
-          });
-        } else {
-          reject('name');
-        }
-
-        if (!_this2.tour.itinerary) {
-          reject('itinerary');
-        }
-
-        resolve();
-      });
-    },
-    checkNameValid: function checkNameValid() {
       var _this3 = this;
 
-      return new Promise(function (resolve) {
-        var uri = "http://localhost:8000/tour/valid/".concat(_this3.tour.name);
-        Axios.get(uri).then(function (response) {
-          resolve(response.data);
-        });
+      var passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+      var valid = true;
+
+      if (!this.booking.tour_date) {
+        valid = false;
+      }
+
+      this.booking.passengers.forEach(function (passenger, index) {
+        _this3.booking.passengers[index].checked = true;
+
+        if (valid) {
+          Object.keys(passenger).some(function (elem) {
+            if (passenger_required.includes(elem) && !passenger[elem]) {
+              valid = false;
+            }
+          });
+        }
       });
+      return valid;
     }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingEdit.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingEdit.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuejs-datepicker */ "./node_modules/vuejs-datepicker/dist/vuejs-datepicker.esm.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      booking: {
+        tour_id: this.$route.params.tourId,
+        tour_name: '',
+        tour_date: '',
+        passengers: []
+      },
+      submitted: false
+    };
+  },
+  components: {
+    Datepicker: vuejs_datepicker__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  created: function created() {
+    var _this = this;
+
+    var uri = "http://localhost:8000/booking/tour/".concat(this.$route.params.tourId);
+    Axios.get(uri).then(function (response) {
+      _this.booking.tour_id = response.data.id;
+      _this.booking.tour_name = response.data.name;
+
+      if (response.data.dates) {
+        _this.booking.tour_dates = response.data.dates.map(function (date) {
+          return {
+            'value': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('YYYY-MM-DD'),
+            'label': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('DD MMM YYYY')
+          };
+        });
+      }
+    });
+  },
+  methods: {
+    createBooking: function createBooking() {
+      var _this2 = this;
+
+      this.submitted = true;
+
+      if (this.validate()) {
+        var uri = "http://localhost:8000/booking/";
+        Axios.post(uri, this.booking).then(function (response) {
+          if (response.data.status === 'success') {
+            _this2.$router.push({
+              name: 'tourList'
+            });
+          } else {
+            alert(response.data.message);
+          }
+        });
+      }
+    },
+    validate: function validate() {
+      var _this3 = this;
+
+      var passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+      var valid = true;
+
+      if (!this.booking.tour_date) {
+        valid = false;
+      }
+
+      this.booking.passengers.forEach(function (passenger, index) {
+        _this3.booking.passengers[index].checked = true;
+
+        if (valid) {
+          Object.keys(passenger).some(function (elem) {
+            if (passenger_required.includes(elem) && !passenger[elem]) {
+              valid = false;
+            }
+          });
+        }
+      });
+      return valid;
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingList.vue?vue&type=script&lang=js&":
+/*!**********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingList.vue?vue&type=script&lang=js& ***!
+  \**********************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      bookings: [],
+      status: ['Submitted', 'Confirmed', 'Cancelled']
+    };
+  },
+  created: function created() {
+    var _this = this;
+
+    var uri = 'http://localhost:8000/booking/';
+    Axios.get(uri).then(function (response) {
+      _this.bookings = response.data;
+    });
   }
 });
 
@@ -1899,6 +2156,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -1907,7 +2178,8 @@ __webpack_require__.r(__webpack_exports__);
       tour: {
         name: '',
         itinerary: '',
-        dates: []
+        dates: [],
+        status: 0
       },
       nameValid: null,
       submitted: false
@@ -2054,6 +2326,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2064,7 +2350,8 @@ __webpack_require__.r(__webpack_exports__);
         name: '',
         itinerary: '',
         oldDates: [],
-        dates: []
+        dates: [],
+        status: ''
       },
       selected: {
         dates: []
@@ -2102,11 +2389,6 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
-    // selectDate(index) {
-    //     // console.log(this.tour.oldDates)
-    //     // this.selected.dates = this.tour.oldDates.map(date => new Date(date.date));
-    //     // console.log(this.selected.dates)
-    // },
     updateTour: function updateTour() {
       var _this2 = this;
 
@@ -2212,10 +2494,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      tours: []
+      tours: [],
+      status: ['Draft', 'Public']
     };
   },
   created: function created() {
@@ -55127,10 +55412,10 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof="fun
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Booking.vue?vue&type=template&id=28bb4584&":
-/*!**********************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Booking.vue?vue&type=template&id=28bb4584& ***!
-  \**********************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a&":
+/*!*************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a& ***!
+  \*************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -55144,7 +55429,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
     _c("h2", { staticClass: "m-5 text-center text-primary" }, [
-      _vm._v("New Tour")
+      _vm._v("Booking")
     ]),
     _vm._v(" "),
     _c(
@@ -55153,141 +55438,347 @@ var render = function() {
         on: {
           submit: function($event) {
             $event.preventDefault()
-            return _vm.createTour($event)
+            return _vm.createBooking($event)
           }
         }
       },
       [
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Tour Name")]),
+        _c("input", {
+          attrs: { type: "hidden", name: "tour_id" },
+          domProps: { value: _vm.booking.tour_id }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Tour Name")
+          ]),
           _vm._v(" "),
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.tour.name,
-                expression: "tour.name"
-              }
-            ],
-            ref: "name",
-            class: {
-              "form-control": true,
-              "is-invalid": _vm.submitted && (!_vm.tour.name || !_vm.nameValid)
-            },
-            attrs: { type: "text", placeholder: "Tour Name" },
-            domProps: { value: _vm.tour.name },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.$set(_vm.tour, "name", $event.target.value)
-              }
-            }
-          }),
-          _vm._v(" "),
-          _c("div", { staticClass: "invalid-feedback" }, [
-            !_vm.tour.name
-              ? _c("span", [_vm._v("The tour name field is required.")])
-              : !_vm.nameValid
-              ? _c("span", [_vm._v("The tour name is already used.")])
-              : _vm._e()
+          _c("div", { staticClass: "col-sm-10" }, [
+            _c("input", {
+              staticClass: "form-control-plaintext",
+              attrs: { disabled: "", type: "text" },
+              domProps: { value: _vm.booking.tour_name }
+            })
           ])
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Itinerary")]),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Tour Date")
+          ]),
           _vm._v(" "),
-          _c("textarea", {
-            directives: [
+          _c("div", { staticClass: "col-sm-10" }, [
+            _c(
+              "select",
               {
-                name: "model",
-                rawName: "v-model",
-                value: _vm.tour.itinerary,
-                expression: "tour.itinerary"
-              }
-            ],
-            ref: "itinerary",
-            class: {
-              "form-control": true,
-              "is-invalid": _vm.submitted && !_vm.tour.itinerary
-            },
-            attrs: { rows: "5", placeholder: "Itinerary" },
-            domProps: { value: _vm.tour.itinerary },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.booking.tour_date,
+                    expression: "booking.tour_date"
+                  }
+                ],
+                class: {
+                  "custom-select": true,
+                  "mr-sm-2": true,
+                  "form-control": true,
+                  "is-invalid": _vm.submitted && !_vm.booking.tour_date
+                },
+                attrs: { name: "tour_date" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.$set(
+                      _vm.booking,
+                      "tour_date",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
+                  }
                 }
-                _vm.$set(_vm.tour, "itinerary", $event.target.value)
-              }
-            }
-          }),
+              },
+              [
+                _c("option", { attrs: { value: "" } }, [_vm._v("Choose...")]),
+                _vm._v(" "),
+                _vm._l(_vm.booking.tour_dates, function(date) {
+                  return _c(
+                    "option",
+                    {
+                      key: date.index,
+                      ref: "tour_date",
+                      refInFor: true,
+                      domProps: { value: date.value }
+                    },
+                    [_vm._v(_vm._s(date.label))]
+                  )
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "invalid-feedback" }, [
+              _vm._v("The Tour Date field is required.")
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Passengers")
+          ]),
           _vm._v(" "),
-          _c("div", { staticClass: "invalid-feedback" }, [
-            _vm._v("The itinerary field is required.")
+          _c("div", { staticClass: "col-sm-10 text-right" }, [
+            _c("input", {
+              staticClass: "btn btn-success",
+              attrs: { type: "button", value: "Add" },
+              on: {
+                click: function($event) {
+                  return _vm.booking.passengers.push({
+                    checked: false,
+                    given_name: "",
+                    sur_name: "",
+                    email: "",
+                    mobile: "",
+                    passport: "",
+                    birth_date: "",
+                    special_request: ""
+                  })
+                }
+              }
+            })
           ])
         ]),
         _vm._v(" "),
         _c(
           "div",
           { staticClass: "form-group" },
-          [
-            _c("label", { attrs: { for: "" } }, [_vm._v("Available Dates")]),
-            _vm._v(" "),
-            _vm._l(_vm.tour.dates.concat([""]), function(date, index) {
-              return _c(
-                "div",
-                { key: index, staticClass: "input-group mb-3" },
-                [
-                  _c("datepicker", {
-                    attrs: {
-                      name: "date[]",
-                      "bootstrap-styling": true,
-                      "disabled-dates": _vm.tour,
-                      placeholder: "Select Date"
-                    },
-                    model: {
-                      value: _vm.tour.dates[index],
-                      callback: function($$v) {
-                        _vm.$set(_vm.tour.dates, index, $$v)
+          _vm._l(_vm.booking.passengers, function(data, index) {
+            return _c("ul", { staticClass: "list-group mb-2" }, [
+              _c("li", { staticClass: "list-group-item" }, [
+                _c("div", { staticClass: "form-row" }, [
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Given Name")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.given_name,
+                          expression: "data.given_name"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.given_name
                       },
-                      expression: "tour.dates[index]"
-                    }
-                  }),
+                      attrs: { type: "text", placeholder: "Given Name" },
+                      domProps: { value: data.given_name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "given_name", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Surname")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.sur_name,
+                          expression: "data.sur_name"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.sur_name
+                      },
+                      attrs: { type: "text", placeholder: "Surname" },
+                      domProps: { value: data.sur_name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "sur_name", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Email")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.email,
+                          expression: "data.email"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.email
+                      },
+                      attrs: { type: "text", placeholder: "Email" },
+                      domProps: { value: data.email },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "email", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Mobile")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.mobile,
+                          expression: "data.mobile"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.mobile
+                      },
+                      attrs: { type: "text", placeholder: "Mobile" },
+                      domProps: { value: data.mobile },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "mobile", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Passport")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.passport,
+                          expression: "data.passport"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.passport
+                      },
+                      attrs: { type: "text", placeholder: "Passport" },
+                      domProps: { value: data.passport },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "passport", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
                   _vm._v(" "),
                   _c(
                     "div",
-                    {
+                    { staticClass: "col-md-4 mb-3" },
+                    [
+                      _c("label", [_vm._v("Birth Date")]),
+                      _vm._v(" "),
+                      _c("datepicker", {
+                        attrs: {
+                          "input-class": {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.birth_date
+                          },
+                          placeholder: "Select Birth Date"
+                        },
+                        model: {
+                          value: data.birth_date,
+                          callback: function($$v) {
+                            _vm.$set(data, "birth_date", $$v)
+                          },
+                          expression: "data.birth_date"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-12" }, [
+                    _c("label", [_vm._v("Special Request")]),
+                    _vm._v(" "),
+                    _c("textarea", {
                       directives: [
                         {
-                          name: "show",
-                          rawName: "v-show",
-                          value: date,
-                          expression: "date"
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.special_request,
+                          expression: "data.special_request"
                         }
                       ],
-                      staticClass: "input-group-append",
+                      staticClass: "form-control",
+                      attrs: { placeholder: "Special Request" },
+                      domProps: { value: data.special_request },
                       on: {
-                        click: function($event) {
-                          return _vm.tour.dates.splice(index, 1)
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "special_request", $event.target.value)
                         }
                       }
-                    },
-                    [_vm._m(0, true)]
-                  )
-                ],
-                1
-              )
-            })
-          ],
-          2
+                    })
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                staticClass: "btn btn-secondary mb-2",
+                attrs: { type: "button", value: "Remove" },
+                on: {
+                  click: function($event) {
+                    return _vm.booking.passengers.splice(index, 1)
+                  }
+                }
+              })
+            ])
+          }),
+          0
         ),
         _vm._v(" "),
         _c(
           "div",
-          { staticClass: "text-center" },
+          { staticClass: "text-center mb-10" },
           [
             _c(
               "button",
@@ -55307,16 +55798,496 @@ var render = function() {
     )
   ])
 }
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130&":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130& ***!
+  \**************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("h2", { staticClass: "m-5 text-center text-primary" }, [
+      _vm._v("Booking")
+    ]),
+    _vm._v(" "),
+    _c(
+      "form",
+      {
+        on: {
+          submit: function($event) {
+            $event.preventDefault()
+            return _vm.createBooking($event)
+          }
+        }
+      },
+      [
+        _c("input", {
+          attrs: { type: "hidden", name: "tour_id" },
+          domProps: { value: _vm.booking.tour_id }
+        }),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Tour Name")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-10" }, [
+            _c("input", {
+              staticClass: "form-control-plaintext",
+              attrs: { disabled: "", type: "text" },
+              domProps: { value: _vm.booking.tour_name }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Tour Date")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-10" }, [
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.booking.tour_date,
+                    expression: "booking.tour_date"
+                  }
+                ],
+                class: {
+                  "custom-select": true,
+                  "mr-sm-2": true,
+                  "form-control": true,
+                  "is-invalid": _vm.submitted && !_vm.booking.tour_date
+                },
+                attrs: { name: "tour_date" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.$set(
+                      _vm.booking,
+                      "tour_date",
+                      $event.target.multiple ? $$selectedVal : $$selectedVal[0]
+                    )
+                  }
+                }
+              },
+              [
+                _c("option", { attrs: { value: "" } }, [_vm._v("Choose...")]),
+                _vm._v(" "),
+                _vm._l(_vm.booking.tour_dates, function(date) {
+                  return _c(
+                    "option",
+                    {
+                      key: date.index,
+                      ref: "tour_date",
+                      refInFor: true,
+                      domProps: { value: date.value }
+                    },
+                    [_vm._v(_vm._s(date.label))]
+                  )
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "invalid-feedback" }, [
+              _vm._v("The Tour Date field is required.")
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group row" }, [
+          _c("label", { staticClass: "col-sm-2 col-form-label" }, [
+            _vm._v("Passengers")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-sm-10 text-right" }, [
+            _c("input", {
+              staticClass: "btn btn-success",
+              attrs: { type: "button", value: "Add" },
+              on: {
+                click: function($event) {
+                  return _vm.booking.passengers.push({
+                    checked: false,
+                    given_name: "",
+                    sur_name: "",
+                    email: "",
+                    mobile: "",
+                    passport: "",
+                    birth_date: "",
+                    special_request: ""
+                  })
+                }
+              }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "form-group" },
+          _vm._l(_vm.booking.passengers, function(data, index) {
+            return _c("ul", { staticClass: "list-group mb-2" }, [
+              _c("li", { staticClass: "list-group-item" }, [
+                _c("div", { staticClass: "form-row" }, [
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Given Name")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.given_name,
+                          expression: "data.given_name"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.given_name
+                      },
+                      attrs: { type: "text", placeholder: "Given Name" },
+                      domProps: { value: data.given_name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "given_name", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Surname")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.sur_name,
+                          expression: "data.sur_name"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.sur_name
+                      },
+                      attrs: { type: "text", placeholder: "Surname" },
+                      domProps: { value: data.sur_name },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "sur_name", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Email")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.email,
+                          expression: "data.email"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.email
+                      },
+                      attrs: { type: "text", placeholder: "Email" },
+                      domProps: { value: data.email },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "email", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Mobile")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.mobile,
+                          expression: "data.mobile"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.mobile
+                      },
+                      attrs: { type: "text", placeholder: "Mobile" },
+                      domProps: { value: data.mobile },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "mobile", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-4 mb-3" }, [
+                    _c("label", [_vm._v("Passport")]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.passport,
+                          expression: "data.passport"
+                        }
+                      ],
+                      class: {
+                        "form-control": true,
+                        "is-invalid": data.checked && !data.passport
+                      },
+                      attrs: { type: "text", placeholder: "Passport" },
+                      domProps: { value: data.passport },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "passport", $event.target.value)
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-md-4 mb-3" },
+                    [
+                      _c("label", [_vm._v("Birth Date")]),
+                      _vm._v(" "),
+                      _c("datepicker", {
+                        attrs: {
+                          "input-class": {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.birth_date
+                          },
+                          placeholder: "Select Birth Date"
+                        },
+                        model: {
+                          value: data.birth_date,
+                          callback: function($$v) {
+                            _vm.$set(data, "birth_date", $$v)
+                          },
+                          expression: "data.birth_date"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-12" }, [
+                    _c("label", [_vm._v("Special Request")]),
+                    _vm._v(" "),
+                    _c("textarea", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: data.special_request,
+                          expression: "data.special_request"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { placeholder: "Special Request" },
+                      domProps: { value: data.special_request },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(data, "special_request", $event.target.value)
+                        }
+                      }
+                    })
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                staticClass: "btn btn-secondary mb-2",
+                attrs: { type: "button", value: "Remove" },
+                on: {
+                  click: function($event) {
+                    return _vm.booking.passengers.splice(index, 1)
+                  }
+                }
+              })
+            ])
+          }),
+          0
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "text-center mb-10" },
+          [
+            _c(
+              "button",
+              { staticClass: "btn btn-primary", attrs: { type: "submit" } },
+              [_vm._v("Submit")]
+            ),
+            _vm._v(" "),
+            _c(
+              "router-link",
+              { staticClass: "btn btn-outline-primary", attrs: { to: "/" } },
+              [_vm._v("Back")]
+            )
+          ],
+          1
+        )
+      ]
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingList.vue?vue&type=template&id=326fa008&":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/BookingList.vue?vue&type=template&id=326fa008& ***!
+  \**************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container" }, [
+    _c("h2", { staticClass: "m-5 text-center" }, [_vm._v("Booking List")]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "float-right mb-2" },
+      [
+        _c(
+          "router-link",
+          {
+            staticClass: "btn btn-primary",
+            attrs: { to: { name: "tourList" } }
+          },
+          [_vm._v("\n            Tour List\n        ")]
+        )
+      ],
+      1
+    ),
+    _vm._v(" "),
+    _c("table", { staticClass: "table table-hover" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        _vm._l(_vm.bookings, function(booking, index) {
+          return _c("tr", { key: index }, [
+            _c("th", { attrs: { scope: "row" } }, [_vm._v(_vm._s(index + 1))]),
+            _vm._v(" "),
+            _c(
+              "td",
+              [
+                _c(
+                  "router-link",
+                  {
+                    staticClass: "text-dark",
+                    attrs: {
+                      to: { name: "bookingEdit", params: { id: booking.id } }
+                    }
+                  },
+                  [_vm._v(_vm._s(booking.tour.name))]
+                )
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(booking.tour_date))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(booking.booking_passenger.length))]),
+            _vm._v(" "),
+            _c("td", [_vm._v(_vm._s(_vm.status[booking.status]))])
+          ])
+        }),
+        0
+      )
+    ])
+  ])
+}
 var staticRenderFns = [
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "span",
-      { staticClass: "btn close", attrs: { "aria-label": "Close" } },
-      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-    )
+    return _c("thead", { staticClass: "thead-dark" }, [
+      _c("tr", [
+        _c("th", { staticStyle: { width: "10%" } }, [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { width: "30%" } }, [_vm._v("Tour Name")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { width: "20%" } }, [_vm._v("Date")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { width: "20%" } }, [_vm._v("Passengers")]),
+        _vm._v(" "),
+        _c("th", { staticStyle: { width: "20%" } }, [_vm._v("Status")])
+      ])
+    ])
   }
 ]
 render._withStripped = true
@@ -55357,7 +56328,95 @@ var render = function() {
       },
       [
         _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Tour Name")]),
+          _c("label", [_vm._v("Status")]),
+          _vm._v(" "),
+          _c("div", [
+            _c(
+              "div",
+              {
+                staticClass: "custom-control custom-radio custom-control-inline"
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.tour.status,
+                      expression: "tour.status"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: {
+                    type: "radio",
+                    id: "draft",
+                    name: "status",
+                    value: "0"
+                  },
+                  domProps: { checked: _vm._q(_vm.tour.status, "0") },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(_vm.tour, "status", "0")
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label",
+                    attrs: { for: "draft" }
+                  },
+                  [_vm._v("Draft")]
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "custom-control custom-radio custom-control-inline"
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.tour.status,
+                      expression: "tour.status"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: {
+                    type: "radio",
+                    id: "public",
+                    name: "status",
+                    value: "1"
+                  },
+                  domProps: { checked: _vm._q(_vm.tour.status, "1") },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(_vm.tour, "status", "1")
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label",
+                    attrs: { for: "public" }
+                  },
+                  [_vm._v("Public")]
+                )
+              ]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", [_vm._v("Tour Name")]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -55395,7 +56454,7 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Itinerary")]),
+          _c("label", [_vm._v("Itinerary")]),
           _vm._v(" "),
           _c("textarea", {
             directives: [
@@ -55432,7 +56491,7 @@ var render = function() {
           "div",
           { staticClass: "form-group" },
           [
-            _c("label", { attrs: { for: "" } }, [_vm._v("Available Dates")]),
+            _c("label", [_vm._v("Available Dates")]),
             _vm._v(" "),
             _vm._l(_vm.tour.dates.concat([""]), function(date, index) {
               return _c(
@@ -55442,6 +56501,7 @@ var render = function() {
                   _c("datepicker", {
                     attrs: {
                       name: "date[]",
+                      "wrapper-class": "w60",
                       "bootstrap-styling": true,
                       "disabled-dates": _vm.tour,
                       placeholder: "Select Date"
@@ -55555,7 +56615,95 @@ var render = function() {
       },
       [
         _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Tour Name")]),
+          _c("label", [_vm._v("Status")]),
+          _vm._v(" "),
+          _c("div", [
+            _c(
+              "div",
+              {
+                staticClass: "custom-control custom-radio custom-control-inline"
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.tour.status,
+                      expression: "tour.status"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: {
+                    type: "radio",
+                    id: "draft",
+                    name: "status",
+                    value: "0"
+                  },
+                  domProps: { checked: _vm._q(_vm.tour.status, "0") },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(_vm.tour, "status", "0")
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label",
+                    attrs: { for: "draft" }
+                  },
+                  [_vm._v("Draft")]
+                )
+              ]
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              {
+                staticClass: "custom-control custom-radio custom-control-inline"
+              },
+              [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.tour.status,
+                      expression: "tour.status"
+                    }
+                  ],
+                  staticClass: "custom-control-input",
+                  attrs: {
+                    type: "radio",
+                    id: "public",
+                    name: "status",
+                    value: "1"
+                  },
+                  domProps: { checked: _vm._q(_vm.tour.status, "1") },
+                  on: {
+                    change: function($event) {
+                      return _vm.$set(_vm.tour, "status", "1")
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _c(
+                  "label",
+                  {
+                    staticClass: "custom-control-label",
+                    attrs: { for: "public" }
+                  },
+                  [_vm._v("Public")]
+                )
+              ]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-group" }, [
+          _c("label", [_vm._v("Tour Name")]),
           _vm._v(" "),
           _c("input", {
             directives: [
@@ -55594,7 +56742,7 @@ var render = function() {
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "form-group" }, [
-          _c("label", { attrs: { for: "" } }, [_vm._v("Itinerary")]),
+          _c("label", [_vm._v("Itinerary")]),
           _vm._v(" "),
           _c("textarea", {
             directives: [
@@ -55631,7 +56779,7 @@ var render = function() {
           "div",
           { staticClass: "form-group" },
           [
-            _c("label", { attrs: { for: "" } }, [_vm._v("Available Dates")]),
+            _c("label", [_vm._v("Available Dates")]),
             _vm._v(" "),
             _vm._l(_vm.tour.oldDates, function(date, index) {
               return _c(
@@ -55685,6 +56833,7 @@ var render = function() {
                   _c("datepicker", {
                     attrs: {
                       name: "date[]",
+                      "wrapper-class": "w60",
                       "bootstrap-styling": true,
                       "disabled-dates": _vm.selected,
                       placeholder: "Select Date"
@@ -55801,7 +56950,7 @@ var render = function() {
           "router-link",
           {
             staticClass: "btn btn-success",
-            attrs: { to: { name: "tourAdd" } }
+            attrs: { to: { name: "bookingList" } }
           },
           [_vm._v("\n            Booking List\n        ")]
         )
@@ -55833,19 +56982,26 @@ var render = function() {
               1
             ),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(tour.status))]),
+            _c("td", [_vm._v(_vm._s(_vm.status[tour.status]))]),
             _vm._v(" "),
             _c(
               "td",
               [
-                _c(
-                  "router-link",
-                  {
-                    staticClass: "btn btn-outline-success btn-sm",
-                    attrs: { to: { name: "booking", params: { id: tour.id } } }
-                  },
-                  [_vm._v("Booking")]
-                )
+                tour.status === 1
+                  ? _c(
+                      "router-link",
+                      {
+                        staticClass: "btn btn-outline-success btn-sm",
+                        attrs: {
+                          to: {
+                            name: "bookingAdd",
+                            params: { tourId: tour.id }
+                          }
+                        }
+                      },
+                      [_vm._v("Booking")]
+                    )
+                  : _vm._e()
               ],
               1
             )
@@ -73180,9 +74336,17 @@ var routes = [{
   path: '/tour-edit/:id',
   component: __webpack_require__(/*! ./components/TourEdit.vue */ "./resources/js/components/TourEdit.vue")["default"]
 }, {
-  name: 'booking',
-  path: '/booking/:id',
-  component: __webpack_require__(/*! ./components/Booking.vue */ "./resources/js/components/Booking.vue")["default"]
+  name: 'bookingList',
+  path: '/booking-list',
+  component: __webpack_require__(/*! ./components/BookingList.vue */ "./resources/js/components/BookingList.vue")["default"]
+}, {
+  name: 'bookingAdd',
+  path: '/booking-add/:tourId',
+  component: __webpack_require__(/*! ./components/BookingAdd.vue */ "./resources/js/components/BookingAdd.vue")["default"]
+}, {
+  name: 'bookingEdit',
+  path: '/booking-edit/:id',
+  component: __webpack_require__(/*! ./components/BookingEdit.vue */ "./resources/js/components/BookingEdit.vue")["default"]
 }];
 var router = new VueRouter({
   routes: routes
@@ -73251,17 +74415,17 @@ if (token) {
 
 /***/ }),
 
-/***/ "./resources/js/components/Booking.vue":
-/*!*********************************************!*\
-  !*** ./resources/js/components/Booking.vue ***!
-  \*********************************************/
+/***/ "./resources/js/components/BookingAdd.vue":
+/*!************************************************!*\
+  !*** ./resources/js/components/BookingAdd.vue ***!
+  \************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Booking.vue?vue&type=template&id=28bb4584& */ "./resources/js/components/Booking.vue?vue&type=template&id=28bb4584&");
-/* harmony import */ var _Booking_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Booking.vue?vue&type=script&lang=js& */ "./resources/js/components/Booking.vue?vue&type=script&lang=js&");
+/* harmony import */ var _BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BookingAdd.vue?vue&type=template&id=5e4dd39a& */ "./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a&");
+/* harmony import */ var _BookingAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookingAdd.vue?vue&type=script&lang=js& */ "./resources/js/components/BookingAdd.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -73271,9 +74435,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Booking_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _BookingAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -73283,38 +74447,176 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/Booking.vue"
+component.options.__file = "resources/js/components/BookingAdd.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/Booking.vue?vue&type=script&lang=js&":
-/*!**********************************************************************!*\
-  !*** ./resources/js/components/Booking.vue?vue&type=script&lang=js& ***!
-  \**********************************************************************/
+/***/ "./resources/js/components/BookingAdd.vue?vue&type=script&lang=js&":
+/*!*************************************************************************!*\
+  !*** ./resources/js/components/BookingAdd.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Booking_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./Booking.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Booking.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Booking_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingAdd.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingAdd.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingAdd_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/Booking.vue?vue&type=template&id=28bb4584&":
-/*!****************************************************************************!*\
-  !*** ./resources/js/components/Booking.vue?vue&type=template&id=28bb4584& ***!
-  \****************************************************************************/
+/***/ "./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a&":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a& ***!
+  \*******************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./Booking.vue?vue&type=template&id=28bb4584& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Booking.vue?vue&type=template&id=28bb4584&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingAdd.vue?vue&type=template&id=5e4dd39a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingAdd.vue?vue&type=template&id=5e4dd39a&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Booking_vue_vue_type_template_id_28bb4584___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingAdd_vue_vue_type_template_id_5e4dd39a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingEdit.vue":
+/*!*************************************************!*\
+  !*** ./resources/js/components/BookingEdit.vue ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BookingEdit.vue?vue&type=template&id=13df5130& */ "./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130&");
+/* harmony import */ var _BookingEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookingEdit.vue?vue&type=script&lang=js& */ "./resources/js/components/BookingEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _BookingEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/BookingEdit.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingEdit.vue?vue&type=script&lang=js&":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/BookingEdit.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingEdit.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingEdit.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingEdit_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130& ***!
+  \********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingEdit.vue?vue&type=template&id=13df5130& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingEdit.vue?vue&type=template&id=13df5130&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingEdit_vue_vue_type_template_id_13df5130___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingList.vue":
+/*!*************************************************!*\
+  !*** ./resources/js/components/BookingList.vue ***!
+  \*************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BookingList.vue?vue&type=template&id=326fa008& */ "./resources/js/components/BookingList.vue?vue&type=template&id=326fa008&");
+/* harmony import */ var _BookingList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BookingList.vue?vue&type=script&lang=js& */ "./resources/js/components/BookingList.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
+  _BookingList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/BookingList.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingList.vue?vue&type=script&lang=js&":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/BookingList.vue?vue&type=script&lang=js& ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingList.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingList.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/BookingList.vue?vue&type=template&id=326fa008&":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/BookingList.vue?vue&type=template&id=326fa008& ***!
+  \********************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./BookingList.vue?vue&type=template&id=326fa008& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/BookingList.vue?vue&type=template&id=326fa008&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_BookingList_vue_vue_type_template_id_326fa008___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
@@ -73462,14 +74764,15 @@ __webpack_require__.r(__webpack_exports__);
 /*!**********************************************!*\
   !*** ./resources/js/components/TourList.vue ***!
   \**********************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _TourList_vue_vue_type_template_id_25f13d81___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TourList.vue?vue&type=template&id=25f13d81& */ "./resources/js/components/TourList.vue?vue&type=template&id=25f13d81&");
 /* harmony import */ var _TourList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TourList.vue?vue&type=script&lang=js& */ "./resources/js/components/TourList.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _TourList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _TourList_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -73499,7 +74802,7 @@ component.options.__file = "resources/js/components/TourList.vue"
 /*!***********************************************************************!*\
   !*** ./resources/js/components/TourList.vue?vue&type=script&lang=js& ***!
   \***********************************************************************/
-/*! exports provided: default */
+/*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

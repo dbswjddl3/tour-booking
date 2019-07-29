@@ -5,7 +5,7 @@
             <router-link class="btn btn-primary" :to="{name: 'tourAdd'}">
                 Add New Tour
             </router-link>
-            <router-link class="btn btn-success" :to="{name: 'tourAdd'}">
+            <router-link class="btn btn-success" :to="{name: 'bookingList'}">
                 Booking List
             </router-link>
         </div>
@@ -21,12 +21,14 @@
             <tbody>
                 <tr v-for="(tour, index) in tours" :key="index">
                     <th scope="row">{{ index + 1 }}</th>
+                    <td><router-link class="text-dark" :to="{name: 'tourEdit', params: {id: tour.id}}">{{ tour.name }}</router-link></td>
+                    <td>{{ status[tour.status] }}</td>
                     <td>
-                        <router-link class="text-dark" :to="{name: 'tourEdit', params: {id: tour.id}}">{{ tour.name }}</router-link>
-                    </td>
-                    <td>{{ tour.status }}</td>
-                    <td>
-                        <router-link class="btn btn-outline-success btn-sm" :to="{name: 'booking', params: {id: tour.id}}">Booking</router-link>
+                        <router-link
+                            v-if="tour.status === 1"  
+                            class="btn btn-outline-success btn-sm" 
+                            :to="{name: 'bookingAdd', params: {tourId: tour.id}}"
+                        >Booking</router-link>
                     </td>
                 </tr>
             </tbody>
@@ -38,6 +40,7 @@
         data() {
             return {
                 tours: [],
+                status: ['Draft', 'Public'],
             }
         },
         created() {

@@ -10644,13 +10644,17 @@ a.text-dark:focus {
   }
 }
 
-.vdp-datepicker,
+.vdp-datepicker.w60,
 .dates.input-group {
   width: 60%;
 }
 
-.dates.input-group input[disabled],
-.vdp-datepicker .form-control[readonly] {
-  background-color: #ffffff;
+input[disabled],
+input[readonly] {
+  background-color: #ffffff !important;
+}
+
+.custom-control-label {
+  position: unset;
 }
 
