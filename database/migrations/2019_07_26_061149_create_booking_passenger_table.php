@@ -17,12 +17,12 @@ class CreateBookingPassengerTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('booking_id');	
             $table->unsignedInteger('passenger_id');	
-            $table->text('special_request');	
+            $table->text('special_request')->nullable();	
         });
 
         Schema::table('booking_passenger', function($table) {
-            $table->foreign('booking_id')->references('id')->on('booking');
-            $table->foreign('passenger_id')->references('id')->on('passenger');
+            $table->foreign('booking_id')->references('id')->on('booking')->onDelete('cascade');
+            $table->foreign('passenger_id')->references('id')->on('passenger')->onDelete('cascade');
         });
     }
 

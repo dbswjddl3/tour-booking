@@ -118,9 +118,21 @@ class TourController extends Controller
         }
     }
 
-    public function showEnable($id) {
-        return Tour::with(['dates' => function ($query) {
+    public function booking($id) {
+        $data = Tour::with(['dates' => function ($query) {
              $query->where('status', 0);
         }])->where('id', $id)->first();
+
+        return [
+            'booking' => [
+                'tour_id' => $data['id'],
+                'tour_name' => $data['name'],
+                'tour_date' => '',
+                'passengers' => [],
+                'status' => $data['status'],
+            ],
+            'tour_dates' => $data['dates'],
+        ];
+
     }
 }

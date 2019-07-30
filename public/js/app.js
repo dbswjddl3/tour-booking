@@ -1781,11 +1781,12 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       booking: {
-        tour_id: this.$route.params.tourId,
+        tour_id: '',
         tour_name: '',
         tour_date: '',
         passengers: []
       },
+      tour_dates: [],
       submitted: false
     };
   },
@@ -1797,11 +1798,10 @@ __webpack_require__.r(__webpack_exports__);
 
     var uri = "http://localhost:8000/booking/tour/".concat(this.$route.params.tourId);
     Axios.get(uri).then(function (response) {
-      _this.booking.tour_id = response.data.id;
-      _this.booking.tour_name = response.data.name;
+      _this.booking = response.data.booking;
 
-      if (response.data.dates) {
-        _this.booking.tour_dates = response.data.dates.map(function (date) {
+      if (response.data.tour_dates) {
+        _this.tour_dates = response.data.tour_dates.map(function (date) {
           return {
             'value': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('YYYY-MM-DD'),
             'label': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('DD MMM YYYY')
@@ -1821,7 +1821,7 @@ __webpack_require__.r(__webpack_exports__);
         Axios.post(uri, this.booking).then(function (response) {
           if (response.data.status === 'success') {
             _this2.$router.push({
-              name: 'tourList'
+              name: 'bookingList'
             });
           } else {
             alert(response.data.message);
@@ -1832,7 +1832,7 @@ __webpack_require__.r(__webpack_exports__);
     validate: function validate() {
       var _this3 = this;
 
-      var passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+      var passenger_required = ['given_name', 'surname', 'email', 'mobile', 'passport', 'birth_date'];
       var valid = true;
 
       if (!this.booking.tour_date) {
@@ -1950,11 +1950,13 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       booking: {
-        tour_id: this.$route.params.tourId,
+        id: '',
+        tour_id: '',
         tour_name: '',
         tour_date: '',
         passengers: []
       },
+      tour_dates: [],
       submitted: false
     };
   },
@@ -1964,13 +1966,12 @@ __webpack_require__.r(__webpack_exports__);
   created: function created() {
     var _this = this;
 
-    var uri = "http://localhost:8000/booking/tour/".concat(this.$route.params.tourId);
+    var uri = "http://localhost:8000/booking/".concat(this.$route.params.id);
     Axios.get(uri).then(function (response) {
-      _this.booking.tour_id = response.data.id;
-      _this.booking.tour_name = response.data.name;
+      _this.booking = response.data.booking;
 
-      if (response.data.dates) {
-        _this.booking.tour_dates = response.data.dates.map(function (date) {
+      if (response.data.tour_dates) {
+        _this.tour_dates = response.data.tour_dates.map(function (date) {
           return {
             'value': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('YYYY-MM-DD'),
             'label': moment__WEBPACK_IMPORTED_MODULE_1___default()(date.date).format('DD MMM YYYY')
@@ -1980,17 +1981,17 @@ __webpack_require__.r(__webpack_exports__);
     });
   },
   methods: {
-    createBooking: function createBooking() {
+    updateBooking: function updateBooking() {
       var _this2 = this;
 
       this.submitted = true;
 
       if (this.validate()) {
-        var uri = "http://localhost:8000/booking/";
-        Axios.post(uri, this.booking).then(function (response) {
+        var uri = "http://localhost:8000/booking/".concat(this.$route.params.id);
+        Axios.patch(uri, this.booking).then(function (response) {
           if (response.data.status === 'success') {
             _this2.$router.push({
-              name: 'tourList'
+              name: 'bookingList'
             });
           } else {
             alert(response.data.message);
@@ -2001,7 +2002,7 @@ __webpack_require__.r(__webpack_exports__);
     validate: function validate() {
       var _this3 = this;
 
-      var passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+      var passenger_required = ['given_name', 'surname', 'email', 'mobile', 'passport', 'birth_date'];
       var valid = true;
 
       if (!this.booking.tour_date) {
@@ -55507,7 +55508,7 @@ var render = function() {
               [
                 _c("option", { attrs: { value: "" } }, [_vm._v("Choose...")]),
                 _vm._v(" "),
-                _vm._l(_vm.booking.tour_dates, function(date) {
+                _vm._l(_vm.tour_dates, function(date) {
                   return _c(
                     "option",
                     {
@@ -55534,7 +55535,7 @@ var render = function() {
             _vm._v("Passengers")
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "col-sm-10 text-right" }, [
+          _c("div", { staticClass: "col-sm-10" }, [
             _c("input", {
               staticClass: "btn btn-success",
               attrs: { type: "button", value: "Add" },
@@ -55543,7 +55544,7 @@ var render = function() {
                   return _vm.booking.passengers.push({
                     checked: false,
                     given_name: "",
-                    sur_name: "",
+                    surname: "",
                     email: "",
                     mobile: "",
                     passport: "",
@@ -55600,22 +55601,22 @@ var render = function() {
                         {
                           name: "model",
                           rawName: "v-model",
-                          value: data.sur_name,
-                          expression: "data.sur_name"
+                          value: data.surname,
+                          expression: "data.surname"
                         }
                       ],
                       class: {
                         "form-control": true,
-                        "is-invalid": data.checked && !data.sur_name
+                        "is-invalid": data.checked && !data.surname
                       },
                       attrs: { type: "text", placeholder: "Surname" },
-                      domProps: { value: data.sur_name },
+                      domProps: { value: data.surname },
                       on: {
                         input: function($event) {
                           if ($event.target.composing) {
                             return
                           }
-                          _vm.$set(data, "sur_name", $event.target.value)
+                          _vm.$set(data, "surname", $event.target.value)
                         }
                       }
                     })
@@ -55788,7 +55789,10 @@ var render = function() {
             _vm._v(" "),
             _c(
               "router-link",
-              { staticClass: "btn btn-outline-primary", attrs: { to: "/" } },
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { to: { name: "bookingList" } }
+              },
               [_vm._v("Back")]
             )
           ],
@@ -55831,7 +55835,7 @@ var render = function() {
         on: {
           submit: function($event) {
             $event.preventDefault()
-            return _vm.createBooking($event)
+            return _vm.updateBooking($event)
           }
         }
       },
@@ -55900,7 +55904,7 @@ var render = function() {
               [
                 _c("option", { attrs: { value: "" } }, [_vm._v("Choose...")]),
                 _vm._v(" "),
-                _vm._l(_vm.booking.tour_dates, function(date) {
+                _vm._l(_vm.tour_dates, function(date) {
                   return _c(
                     "option",
                     {
@@ -55936,7 +55940,7 @@ var render = function() {
                   return _vm.booking.passengers.push({
                     checked: false,
                     given_name: "",
-                    sur_name: "",
+                    surname: "",
                     email: "",
                     mobile: "",
                     passport: "",
@@ -55953,218 +55957,224 @@ var render = function() {
           "div",
           { staticClass: "form-group" },
           _vm._l(_vm.booking.passengers, function(data, index) {
-            return _c("ul", { staticClass: "list-group mb-2" }, [
-              _c("li", { staticClass: "list-group-item" }, [
-                _c("div", { staticClass: "form-row" }, [
-                  _c("div", { staticClass: "col-md-4 mb-3" }, [
-                    _c("label", [_vm._v("Given Name")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.given_name,
-                          expression: "data.given_name"
-                        }
-                      ],
-                      class: {
-                        "form-control": true,
-                        "is-invalid": data.checked && !data.given_name
-                      },
-                      attrs: { type: "text", placeholder: "Given Name" },
-                      domProps: { value: data.given_name },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(data, "given_name", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-4 mb-3" }, [
-                    _c("label", [_vm._v("Surname")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.sur_name,
-                          expression: "data.sur_name"
-                        }
-                      ],
-                      class: {
-                        "form-control": true,
-                        "is-invalid": data.checked && !data.sur_name
-                      },
-                      attrs: { type: "text", placeholder: "Surname" },
-                      domProps: { value: data.sur_name },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(data, "sur_name", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-4 mb-3" }, [
-                    _c("label", [_vm._v("Email")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.email,
-                          expression: "data.email"
-                        }
-                      ],
-                      class: {
-                        "form-control": true,
-                        "is-invalid": data.checked && !data.email
-                      },
-                      attrs: { type: "text", placeholder: "Email" },
-                      domProps: { value: data.email },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(data, "email", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-4 mb-3" }, [
-                    _c("label", [_vm._v("Mobile")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.mobile,
-                          expression: "data.mobile"
-                        }
-                      ],
-                      class: {
-                        "form-control": true,
-                        "is-invalid": data.checked && !data.mobile
-                      },
-                      attrs: { type: "text", placeholder: "Mobile" },
-                      domProps: { value: data.mobile },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(data, "mobile", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-4 mb-3" }, [
-                    _c("label", [_vm._v("Passport")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.passport,
-                          expression: "data.passport"
-                        }
-                      ],
-                      class: {
-                        "form-control": true,
-                        "is-invalid": data.checked && !data.passport
-                      },
-                      attrs: { type: "text", placeholder: "Passport" },
-                      domProps: { value: data.passport },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(data, "passport", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "col-md-4 mb-3" },
-                    [
-                      _c("label", [_vm._v("Birth Date")]),
-                      _vm._v(" "),
-                      _c("datepicker", {
-                        attrs: {
-                          "input-class": {
+            return data.status === 0
+              ? _c("ul", { staticClass: "list-group mb-2" }, [
+                  _c("li", { staticClass: "list-group-item" }, [
+                    _c("div", { staticClass: "form-row" }, [
+                      _c("div", { staticClass: "col-md-4 mb-3" }, [
+                        _c("label", [_vm._v("Given Name")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.given_name,
+                              expression: "data.given_name"
+                            }
+                          ],
+                          class: {
                             "form-control": true,
-                            "is-invalid": data.checked && !data.birth_date
+                            "is-invalid": data.checked && !data.given_name
                           },
-                          placeholder: "Select Birth Date"
-                        },
-                        model: {
-                          value: data.birth_date,
-                          callback: function($$v) {
-                            _vm.$set(data, "birth_date", $$v)
-                          },
-                          expression: "data.birth_date"
-                        }
-                      })
-                    ],
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _c("label", [_vm._v("Special Request")]),
-                    _vm._v(" "),
-                    _c("textarea", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: data.special_request,
-                          expression: "data.special_request"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { placeholder: "Special Request" },
-                      domProps: { value: data.special_request },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
+                          attrs: { type: "text", placeholder: "Given Name" },
+                          domProps: { value: data.given_name },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(data, "given_name", $event.target.value)
+                            }
                           }
-                          _vm.$set(data, "special_request", $event.target.value)
-                        }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4 mb-3" }, [
+                        _c("label", [_vm._v("Surname")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.surname,
+                              expression: "data.surname"
+                            }
+                          ],
+                          class: {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.surname
+                          },
+                          attrs: { type: "text", placeholder: "Surname" },
+                          domProps: { value: data.surname },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(data, "surname", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4 mb-3" }, [
+                        _c("label", [_vm._v("Email")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.email,
+                              expression: "data.email"
+                            }
+                          ],
+                          class: {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.email
+                          },
+                          attrs: { type: "text", placeholder: "Email" },
+                          domProps: { value: data.email },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(data, "email", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4 mb-3" }, [
+                        _c("label", [_vm._v("Mobile")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.mobile,
+                              expression: "data.mobile"
+                            }
+                          ],
+                          class: {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.mobile
+                          },
+                          attrs: { type: "text", placeholder: "Mobile" },
+                          domProps: { value: data.mobile },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(data, "mobile", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-4 mb-3" }, [
+                        _c("label", [_vm._v("Passport")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.passport,
+                              expression: "data.passport"
+                            }
+                          ],
+                          class: {
+                            "form-control": true,
+                            "is-invalid": data.checked && !data.passport
+                          },
+                          attrs: { type: "text", placeholder: "Passport" },
+                          domProps: { value: data.passport },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(data, "passport", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "col-md-4 mb-3" },
+                        [
+                          _c("label", [_vm._v("Birth Date")]),
+                          _vm._v(" "),
+                          _c("datepicker", {
+                            attrs: {
+                              "input-class": {
+                                "form-control": true,
+                                "is-invalid": data.checked && !data.birth_date
+                              },
+                              placeholder: "Select Birth Date"
+                            },
+                            model: {
+                              value: data.birth_date,
+                              callback: function($$v) {
+                                _vm.$set(data, "birth_date", $$v)
+                              },
+                              expression: "data.birth_date"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "col-md-12" }, [
+                        _c("label", [_vm._v("Special Request")]),
+                        _vm._v(" "),
+                        _c("textarea", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: data.special_request,
+                              expression: "data.special_request"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { placeholder: "Special Request" },
+                          domProps: { value: data.special_request },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                data,
+                                "special_request",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    staticClass: "btn btn-secondary mb-2",
+                    attrs: { type: "button", value: "Remove" },
+                    on: {
+                      click: function($event) {
+                        return _vm.booking.passengers.splice(index, 1)
                       }
-                    })
-                  ])
+                    }
+                  })
                 ])
-              ]),
-              _vm._v(" "),
-              _c("input", {
-                staticClass: "btn btn-secondary mb-2",
-                attrs: { type: "button", value: "Remove" },
-                on: {
-                  click: function($event) {
-                    return _vm.booking.passengers.splice(index, 1)
-                  }
-                }
-              })
-            ])
+              : _vm._e()
           }),
           0
         ),
@@ -56181,7 +56191,10 @@ var render = function() {
             _vm._v(" "),
             _c(
               "router-link",
-              { staticClass: "btn btn-outline-primary", attrs: { to: "/" } },
+              {
+                staticClass: "btn btn-outline-primary",
+                attrs: { to: { name: "bookingList" } }
+              },
               [_vm._v("Back")]
             )
           ],
@@ -56252,7 +56265,7 @@ var render = function() {
                       to: { name: "bookingEdit", params: { id: booking.id } }
                     }
                   },
-                  [_vm._v(_vm._s(booking.tour.name))]
+                  [_vm._v(_vm._s(booking.tour_name))]
                 )
               ],
               1
@@ -56260,7 +56273,7 @@ var render = function() {
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(booking.tour_date))]),
             _vm._v(" "),
-            _c("td", [_vm._v(_vm._s(booking.booking_passenger.length))]),
+            _c("td", [_vm._v(_vm._s(booking.passenger_count))]),
             _vm._v(" "),
             _c("td", [_vm._v(_vm._s(_vm.status[booking.status]))])
           ])

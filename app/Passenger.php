@@ -9,10 +9,15 @@ class Passenger extends Model
     public $timestamps = false;
     protected $table = 'passenger';
     protected $primaryKey = 'id';
-    protected $fillable = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date', 'status'];
+    protected $fillable = ['given_name', 'surname', 'email', 'mobile', 'passport', 'birth_date', 'status'];
     
-    public function Bookings()
+    public function bookings()
     {
         return $this->hasMany('App\Booking');
+    }
+    
+    public function booking_passenger()
+    {
+        return $this->hasMany('App\BookingPassenger');
     }
 }

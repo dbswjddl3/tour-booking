@@ -20,9 +20,9 @@
             <tbody>
                 <tr v-for="(booking, index) in bookings" :key="index">
                     <th scope="row">{{ index + 1 }}</th>
-                    <td><router-link class="text-dark" :to="{name: 'bookingEdit', params: {id: booking.id}}">{{ booking.tour.name }}</router-link></td>
+                    <td><router-link class="text-dark" :to="{name: 'bookingEdit', params: {id: booking.id}}">{{ booking.tour_name }}</router-link></td>
                     <td>{{booking.tour_date}}</td>
-                    <td>{{booking.booking_passenger.length}}</td>
+                    <td>{{booking.passenger_count}}</td>
                     <td>{{status[booking.status]}}</td>
                     <!-- <td>
                         <router-link

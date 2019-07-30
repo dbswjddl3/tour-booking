@@ -26,5 +26,7 @@ Route::resource('tour', 'TourController');
 
 // Booking
 Route::get('booking', 'BookingController@index');
-Route::get('booking/tour/{id}', 'TourController@showEnable');
+Route::get('booking/{id}', 'BookingController@show');
+Route::get('booking/tour/{id}', 'TourController@booking');
 Route::post('booking', 'BookingController@store');
+Route::patch('booking/{id}', 'BookingController@update');

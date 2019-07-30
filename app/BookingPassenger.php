@@ -11,7 +11,13 @@ class BookingPassenger extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['booking_id', 'passenger_id', 'special_request'];
 
-    // public function Booking() {
-    //     return $this->belongsTo('App\Booking');
-    // }
+    public function booking()
+    {
+        return $this->belongsTo('App\Booking');
+    }
+    
+    public function passenger()
+    {
+        return $this->belongsTo('App\Passenger');
+    }
 }

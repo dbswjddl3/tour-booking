@@ -14,15 +14,15 @@
                 <div class="col-sm-10">
                     <select name="tour_date" v-model="booking.tour_date" :class="{'custom-select': true, 'mr-sm-2': true, 'form-control': true, 'is-invalid': submitted && !booking.tour_date}">
                         <option value="">Choose...</option>
-                        <option v-for="date in booking.tour_dates" :key="date.index" :value="date.value" ref="tour_date">{{date.label}}</option>
+                        <option v-for="date in tour_dates" :key="date.index" :value="date.value" ref="tour_date">{{date.label}}</option>
                     </select>
                     <div class="invalid-feedback">The Tour Date field is required.</div>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Passengers</label>
-                <div class="col-sm-10 text-right">
-                    <input type="button" class="btn btn-success" value="Add" @click="booking.passengers.push({checked: false, given_name: '', sur_name: '', email: '', mobile: '', passport: '', birth_date: '', special_request: ''})">
+                <div class="col-sm-10">
+                    <input type="button" class="btn btn-success" value="Add" @click="booking.passengers.push({checked: false, given_name: '', surname: '', email: '', mobile: '', passport: '', birth_date: '', special_request: ''})">
                 </div>
             </div>
             <div class="form-group">
@@ -35,7 +35,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label>Surname</label>
-                                <input type="text" v-model="data.sur_name" :class="{'form-control': true, 'is-invalid': data.checked && !data.sur_name}" placeholder="Surname">
+                                <input type="text" v-model="data.surname" :class="{'form-control': true, 'is-invalid': data.checked && !data.surname}" placeholder="Surname">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label>Email</label>
@@ -68,7 +68,7 @@
             </div>
             <div class="text-center mb-10">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <router-link class="btn btn-outline-primary" :to="'/'">Back</router-link>
+                <router-link class="btn btn-outline-primary" :to="{name: 'bookingList'}">Back</router-link>
             </div>
         </form>
     </div>
@@ -81,11 +81,12 @@
         data() {
             return {
                 booking: {
-                    tour_id: this.$route.params.tourId,
+                    tour_id: '',
                     tour_name: '',
                     tour_date: '',
                     passengers: [],
                 },
+                tour_dates: [],
                 submitted: false,
             }
         },
@@ -95,10 +96,9 @@
         created() {
             let uri = `http://localhost:8000/booking/tour/${this.$route.params.tourId}`;
             Axios.get(uri).then(response => {
-                this.booking.tour_id = response.data.id;
-                this.booking.tour_name = response.data.name;
-                if (response.data.dates) {
-                    this.booking.tour_dates = response.data.dates.map(date => {
+                this.booking = response.data.booking;
+                if (response.data.tour_dates) {
+                    this.tour_dates = response.data.tour_dates.map(date => {
                         return {
                             'value': moment(date.date).format('YYYY-MM-DD'),
                             'label': moment(date.date).format('DD MMM YYYY'),
@@ -114,7 +114,7 @@
                     const uri = `http://localhost:8000/booking/`;
                     Axios.post(uri, this.booking).then(response => {
                         if (response.data.status === 'success') {
-                            this.$router.push({name: 'tourList'});
+                            this.$router.push({name: 'bookingList'});
                         } else {
                             alert(response.data.message);
                         }
@@ -122,7 +122,7 @@
                 }
             },
             validate() {
-                const passenger_required = ['given_name', 'sur_name', 'email', 'mobile', 'passport', 'birth_date'];
+                const passenger_required = ['given_name', 'surname', 'email', 'mobile', 'passport', 'birth_date'];
                 let valid = true;
 
                 if (!this.booking.tour_date) {
